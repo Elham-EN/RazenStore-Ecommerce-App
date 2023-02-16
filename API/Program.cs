@@ -1,5 +1,6 @@
 // Main program file to run the application
-
+using API.Data;
+using Microsoft.EntityFrameworkCore;
 // Host and run our dotnet application (Setup web server)
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<StoreContext>(opt => {
+    opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
 
 // Build our application and store the result of that in the app var
 var app = builder.Build();
@@ -34,5 +38,25 @@ app.UseAuthorization();
 // method that maps incoming HTTP requests to the appropriate controller action methods 
 // based on the routing rules you have defined.
 app.MapControllers();
+
+//The idea behind this we need to get hold of our DBContext service, but we cannot inject
+//our storecontext into this class
+var scope = app.Services.CreateScope();
+var context = scope.ServiceProvider.GetRequiredService<StoreContext>();
+//Log any error
+var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+try
+{
+    //When you make changes to your model and create a new migration using the 
+    //dotnet ef migrations add command, the migration is added to the database 
+    //but not applied until you explicitly call context.Database.Migrate() or 
+    //run the dotnet ef database update command
+    context.Database.Migrate();
+    DbInitializer.Initialize(context);
+}
+catch (Exception ex)
+{
+    logger.LogError(ex, "A problem occured during migration");
+}
 
 app.Run();
