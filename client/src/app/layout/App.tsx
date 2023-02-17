@@ -4,9 +4,9 @@ import {
   createTheme,
   ThemeProvider,
 } from "@mui/material";
-import Catalog from "../../features/catalog/Catalog";
 import Header from "./Header";
 import { useState } from "react";
+import { Outlet } from "react-router-dom";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -21,6 +21,9 @@ function App() {
   const theme = createTheme({
     palette: {
       mode: paletteType,
+      background: {
+        default: paletteType === "light" ? "#eaeaea" : "#121212",
+      },
     },
   });
   return (
@@ -28,7 +31,7 @@ function App() {
       <CssBaseline />
       <Header paletteType={paletteType} onSwitch={onSwitch} />
       <Container sx={{ mb: 4 }}>
-        <Catalog />
+        <Outlet />
       </Container>
     </ThemeProvider>
   );
