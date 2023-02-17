@@ -10,6 +10,7 @@ On Razen-Store Store, online users can shop for a wide range of products
 - Stripe Payment Platform
 - C# + ASP.NET Web API
 - Entity Framework
+- PostgreSQL
 - Swagger For API Documentation and Testing
 - ASP.NET Identity
 - Docker
