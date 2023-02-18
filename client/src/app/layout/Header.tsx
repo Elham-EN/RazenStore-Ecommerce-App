@@ -50,8 +50,13 @@ export default function Header({ paletteType, onSwitch }: Props) {
   };
   const drawer = (
     <Box onClick={handleDrawerToggle} sx={{ textAlign: "left", ml: 1, mt: 10 }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        RAZEN-STORE
+      <Typography
+        component={NavLink}
+        to={"/"}
+        sx={{ color: "inherit", textDecoration: "none", my: 2 }}
+        variant="h6"
+      >
+        Home
       </Typography>
       <Divider />
       <List>
@@ -81,7 +86,7 @@ export default function Header({ paletteType, onSwitch }: Props) {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
+            sx={{ mr: 2, display: { md: "none" } }}
           >
             <Menu />
           </IconButton>
@@ -89,7 +94,7 @@ export default function Header({ paletteType, onSwitch }: Props) {
             display={"flex"}
             alignItems={"center"}
             justifyContent={"space-between"}
-            sx={{ display: { xs: "none", sm: "flex" } }}
+            sx={{ display: { xs: "none", md: "flex" } }}
           >
             <Typography
               component={NavLink}
@@ -171,7 +176,7 @@ export default function Header({ paletteType, onSwitch }: Props) {
             keepMounted: true,
           }}
           sx={{
-            display: { xs: "block", sm: "none" },
+            display: { xs: "block", md: "none" },
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
