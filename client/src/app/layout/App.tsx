@@ -30,7 +30,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Header paletteType={paletteType} onSwitch={onSwitch} />
-      <Container sx={{ mb: 4 }}>
+      <Container sx={{ mb: 4, mt: 12 }}>
         <Outlet />
       </Container>
     </ThemeProvider>
