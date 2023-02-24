@@ -1,5 +1,6 @@
 // Main program file to run the application
 using API.Data;
+using API.Middleware;
 using Microsoft.EntityFrameworkCore;
 // Host and run our dotnet application (Setup web server)
 var builder = WebApplication.CreateBuilder(args);
@@ -27,6 +28,9 @@ var app = builder.Build();
 // API. This give us the opportunity to add middleware to this request and use it in
 // various stages inside the pipeline against that request and we can do something with
 // that request. 
+
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
