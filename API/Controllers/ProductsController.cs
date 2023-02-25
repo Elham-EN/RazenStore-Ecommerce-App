@@ -17,7 +17,7 @@ namespace API.Controllers
         }
         
         //We must specify the of result we are returning
-        [HttpGet]
+        [HttpGet] // api/products
         //The GetProducts method returns a list of all products in the 
         //database in response to an HTTP GET request to the associated URL
         public async Task<ActionResult<List<Product>>> GetProducts() 
@@ -32,7 +32,9 @@ namespace API.Controllers
         [HttpGet("{id}")] // api/products/3
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            return await context.Products.FindAsync(id);
+            var product = await context.Products.FindAsync(id);
+            if (product == null) return NotFound();
+            return product;
         }
  
     }

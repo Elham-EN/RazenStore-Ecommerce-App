@@ -15,6 +15,7 @@ import {
 import { useParams } from "react-router-dom";
 import { Product } from "../../app/models/Product";
 import agent from "../../app/api/agent";
+import NotFound from "../../app/errors/NotFound";
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +35,7 @@ export default function ProductDetails() {
   }
 
   if (!product) {
-    return <h3>product not found</h3>;
+    return <NotFound />;
   }
 
   return (

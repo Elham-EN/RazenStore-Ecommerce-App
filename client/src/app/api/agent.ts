@@ -1,5 +1,7 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { Product } from "../models/Product";
+import { toast } from "react-toastify";
+import { router } from "../router/Routes";
 
 axios.defaults.baseURL = "http://localhost:5000/api/";
 
@@ -7,6 +9,44 @@ axios.defaults.baseURL = "http://localhost:5000/api/";
 function responseBody(response: AxiosResponse) {
   return response.data;
 }
+
+// You can intercept out-going requests or incoming responses
+// before they are handled by then or catch
+axios.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error: AxiosError) => {
+    const { data, status } = error.response as AxiosResponse;
+    switch (status) {
+      case 400:
+        if (data.errors) {
+          const modelStateErrors: string[] = [];
+          for (const key in data.errors) {
+            //etc, Problem1, Problem2...
+            if (data.errors[key]) {
+              modelStateErrors.push(data.errors[key]);
+            }
+          }
+          //Get just two strings
+          throw modelStateErrors.flat();
+        }
+        toast.error(data.title);
+        break;
+      case 401:
+        toast.error(data.title);
+        break;
+      case 500:
+        router.navigate("/server-error", {
+          state: { error: data },
+        });
+        break;
+      default:
+        break;
+    }
+    return Promise.reject(error.response);
+  }
+);
 
 // Different of request, that we're going to use axios for
 const requests = {
@@ -59,6 +99,7 @@ const TestErrors = {
 
 const agent = {
   Catalog,
+
   TestErrors,
 };
 
