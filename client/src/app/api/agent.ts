@@ -3,6 +3,10 @@ import { Product } from "../models/Product";
 import { toast } from "react-toastify";
 import { router } from "../router/Routes";
 
+function sleep() {
+  return new Promise((resolve) => setTimeout(resolve, 500));
+}
+
 axios.defaults.baseURL = "http://localhost:5000/api/";
 
 // Extract the data we are interested from the request body
@@ -13,7 +17,8 @@ function responseBody(response: AxiosResponse) {
 // You can intercept out-going requests or incoming responses
 // before they are handled by then or catch
 axios.interceptors.response.use(
-  (response) => {
+  async (response) => {
+    await sleep();
     return response;
   },
   (error: AxiosError) => {
