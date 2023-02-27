@@ -19,5 +19,7 @@ namespace API.Data
         }
         //This DbSet respresent a table in our database
         public DbSet<Product> Products { get; set; }
+
+        public DbSet<Basket> Baskets {get; set;}
     }
 }
