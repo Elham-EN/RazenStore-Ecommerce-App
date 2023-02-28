@@ -13,7 +13,7 @@ import {
   Drawer,
 } from "@mui/material";
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 
 const midLinks = [
   { title: "catalog", path: "/catalog" },
@@ -123,6 +123,8 @@ export default function Header({ paletteType, onSwitch }: Props) {
               edge="start"
               color="inherit"
               sx={{ mr: 2 }}
+              component={Link}
+              to={"/basket"}
             >
               <Badge badgeContent="4" color="secondary">
                 <ShoppingCart />

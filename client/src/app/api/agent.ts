@@ -8,6 +8,9 @@ function sleep() {
 }
 
 axios.defaults.baseURL = "http://localhost:5000/api/";
+// Our browser will be able to receive cookie and sets cookie
+// inside the browser application storage
+axios.defaults.withCredentials = true;
 
 // Extract the data we are interested from the request body
 function responseBody(response: AxiosResponse) {
@@ -84,6 +87,25 @@ const Catalog = {
   },
 };
 
+const Basket = {
+  get: function () {
+    return requests.get("basket");
+  },
+  addItem: function (productId: number, quantity = 1) {
+    return requests.post(
+      // We're sending data through query string (createdAtRoute)
+      `basket?productId=${productId}&quantity=${quantity}`,
+      {}
+    );
+  },
+  removeItem: function (productId: number, quantity = 1) {
+    return requests.delete(
+      // We're sending data through query string (createdAtRoute)
+      `basket?productId=${productId}&quantity=${quantity}`
+    );
+  },
+};
+
 const TestErrors = {
   get400Error: function () {
     return requests.get("buggy/bad-request");
@@ -104,7 +126,7 @@ const TestErrors = {
 
 const agent = {
   Catalog,
-
+  Basket,
   TestErrors,
 };
 

@@ -16,7 +16,8 @@ namespace API.Controllers
             _context = context;   
         }
 
-        // Endpoint: fetch an individual basket
+        // Endpoint: fetch an individual basket.  Specify the name of the
+        // route. '/api/GetBasket'
         [HttpGet(Name = "GetBasket")]
         public async Task<ActionResult<BasketDto>> GetBasket()
         {
@@ -106,21 +107,21 @@ namespace API.Controllers
         private BasketDto MapBasketToDto(Basket basket)
         {
             return new BasketDto()
+                {
+                    Id = basket.Id,
+                    BuyerId = basket.BuyerId,
+                    // project our item into a basket item dto
+                    items = basket.Items.Select(item => new BasketItemDto
                     {
-                        Id = basket.Id,
-                        BuyerId = basket.BuyerId,
-                        // project our item into a basket item dto
-                        items = basket.Items.Select(item => new BasketItemDto
-                        {
-                            ProductId = item.ProductId,
-                            Name = item.Product.Name,
-                            Price = item.Product.Price,
-                            PictureUrl = item.Product.PictureUrl,
-                            Type = item.Product.Type,
-                            Brand = item.Product.Brand,
-                            Quantity = item.Quantity
-                        }).ToList() // so we get a list basketitem dto
-                    };
+                        ProductId = item.ProductId,
+                        Name = item.Product.Name,
+                        Price = item.Product.Price,
+                        PictureUrl = item.Product.PictureUrl,
+                        Type = item.Product.Type,
+                        Brand = item.Product.Brand,
+                        Quantity = item.Quantity
+                    }).ToList() // so we get a list basketitem dto
+                };
         }
     }
 }

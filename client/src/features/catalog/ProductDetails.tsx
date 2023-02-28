@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Divider,
   Grid,
@@ -12,16 +11,29 @@ import {
   Button,
   Box,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { useParams } from "react-router-dom";
 import { Product } from "../../app/models/Product";
 import agent from "../../app/api/agent";
 import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
+import { toast } from "react-toastify";
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [buttonLoading, setButtonLoading] = useState(false);
+
+  const handleAddItem = (productId: number) => {
+    setButtonLoading(true);
+    agent.Basket.addItem(productId)
+      .catch((error) => console.log(error))
+      .finally(() => {
+        setButtonLoading(false);
+        toast.success("item added to the card");
+      });
+  };
 
   useEffect(() => {
     id &&
@@ -85,12 +97,14 @@ export default function ProductDetails() {
           mt={5}
           sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" } }}
         >
-          <Button
+          <LoadingButton
+            loading={buttonLoading}
+            onClick={() => handleAddItem(product.id)}
             sx={{ mr: { sm: 5 }, mb: { xs: 3, sm: 0 } }}
             variant="contained"
           >
             Add to Cart
-          </Button>
+          </LoadingButton>
           <Button variant="contained">Buy Now</Button>
         </Box>
       </Grid>
