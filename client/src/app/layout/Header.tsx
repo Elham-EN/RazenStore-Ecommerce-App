@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { useStoreContext } from "../context/StoreContext";
 
 const midLinks = [
   { title: "catalog", path: "/catalog" },
@@ -43,6 +44,13 @@ interface Props {
 }
 
 export default function Header({ paletteType, onSwitch }: Props) {
+  const { basket } = useStoreContext();
+  // Get the items inside the basket and multiplied by each of their quantity
+  // use reduce - to reduce an array of items that have a quantity value and
+  // we want to reduce that array into single number that we can use to populate
+  // into our basket icon (badge)
+  const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0);
+
   const [mobileOpen, setMobileOpen] = useState(false);
   const drawerWidth = 200;
   const handleDrawerToggle = () => {
@@ -126,7 +134,7 @@ export default function Header({ paletteType, onSwitch }: Props) {
               component={Link}
               to={"/basket"}
             >
-              <Badge badgeContent="4" color="secondary">
+              <Badge badgeContent={itemCount} color="secondary">
                 <ShoppingCart />
               </Badge>
             </IconButton>
@@ -149,8 +157,10 @@ export default function Header({ paletteType, onSwitch }: Props) {
               edge="start"
               color="inherit"
               sx={{ mr: 2 }}
+              component={Link}
+              to={"/basket"}
             >
-              <Badge badgeContent="4" color="secondary">
+              <Badge badgeContent={itemCount} color="secondary">
                 <ShoppingCart />
               </Badge>
             </IconButton>

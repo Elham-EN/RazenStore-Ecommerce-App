@@ -55,7 +55,7 @@ namespace API.Controllers
 
         // Endpoint: remove item from the basket
         [HttpDelete]
-        public async Task<ActionResult> RemoveBasketItem(int productId, int quantity)
+        public async Task<ActionResult<BasketDto>> RemoveBasketItem(int productId, int quantity)
         {
             // get the basket first
             var basket = await RetrieveBasket();
@@ -64,7 +64,7 @@ namespace API.Controllers
             basket.RemoveItem(productId, quantity);
             // Save changes to the database
             var result = await _context.SaveChangesAsync() > 0;
-            if (result) return Ok();
+            if (result) return MapBasketToDto(basket);
             return BadRequest(new ProblemDetails{Title = "Problem removing item from the basket"});
         }
 

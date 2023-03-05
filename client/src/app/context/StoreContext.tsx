@@ -30,14 +30,16 @@ export function StoreProvider({ children }: PropsWithChildren) {
 
   const removeItem = (productId: number, quantity: number) => {
     if (!basket) return;
-    const items = [...basket.items];
-    // Return the index if its in the array or return -1 if not
+    const items = [...basket.items]; // Copy of basket's items
+    // Return the item index if its in the array or return -1 if not
     const itemIndex = items.findIndex((i) => i.productId === productId);
+    // if item index exist
     if (itemIndex >= 0) {
       items[itemIndex].quantity -= quantity;
       // if quantity is zero we want to remove the item from our basket
       if (items[itemIndex].quantity === 0) {
         items.splice(itemIndex, 1);
+        // Update the global state Basket'items
         setBasket((prevState) => {
           return { ...prevState!, items };
         });
