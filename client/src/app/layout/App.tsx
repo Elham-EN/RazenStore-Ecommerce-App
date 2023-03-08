@@ -13,9 +13,12 @@ import { useStoreContext } from "../context/StoreContext";
 import { getCookie } from "../util/util";
 import agent from "../api/agent";
 import LoadingComponent from "./LoadingComponent";
+import { useDispatch } from "react-redux";
+import { setBasket } from "../../features/basket/basketSlice";
 
 function App() {
-  const { setBasket } = useStoreContext();
+  // const { setBasket } = useStoreContext();
+  const distpatch = useDispatch();
   const [loading, setLoading] = useState(true);
 
   // App initialisation - fetching the basket on app start
@@ -24,13 +27,13 @@ function App() {
     if (buyerId) {
       // This will be stored in our store context
       agent.Basket.get()
-        .then((basket) => setBasket(basket))
+        .then((basket) => distpatch(setBasket(basket)))
         .catch((error) => console.log(error))
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
-  }, [setBasket]);
+  }, [distpatch]);
 
   const [darkMode, setDarkMode] = useState(false);
   const paletteType = darkMode ? "dark" : "light";

@@ -56,6 +56,7 @@ export default function ProductDetails() {
     // not have an item, that means we're also adding an item to the basket
     if (!item || quantity > item.quantity) {
       const updatedQuantity = item ? quantity - item.quantity : quantity;
+
       try {
         const basket = await agent.Basket.addItem(
           product?.id!,
