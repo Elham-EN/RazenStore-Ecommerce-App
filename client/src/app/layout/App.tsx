@@ -25,7 +25,7 @@ function App() {
   useEffect(() => {
     const buyerId = getCookie("buyerId");
     if (buyerId) {
-      // This will be stored in our store context
+      // This will be stored in our redux store
       agent.Basket.get()
         .then((basket) => distpatch(setBasket(basket)))
         .catch((error) => console.log(error))

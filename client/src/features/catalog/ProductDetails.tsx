@@ -16,10 +16,11 @@ import { Product } from "../../app/models/Product";
 import agent from "../../app/api/agent";
 import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
-import { toast } from "react-toastify";
-import { useStoreContext } from "../../app/context/StoreContext";
 import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
-import { removeItem, setBasket } from "../basket/basketSlice";
+import {
+  addBasketItemAsync,
+  removeBasketItemAsync,
+} from "../basket/basketSlice";
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
@@ -27,9 +28,9 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
   //how many items does the user already have of item inside the basket
   const [quantity, setQuantity] = useState(0);
-  const [sumitting, setSubmitting] = useState(false);
+  // const [sumitting, setSubmitting] = useState(false);
   // const { basket, setBasket, removeItem } = useStoreContext();
-  const { basket } = useAppSelector((state) => state.basket);
+  const { basket, status } = useAppSelector((state) => state.basket);
   const dispatch = useAppDispatch();
   //need to find out if we have the item in our basket
   const item = basket?.items.find((item) => item.productId === product?.id);
@@ -53,44 +54,35 @@ export default function ProductDetails() {
   // we need to know if we are adding item to the cart (increasing qty)
   // Need to know if we are add new item to the cart
   const handleUpdateCart = async () => {
-    setSubmitting(true); // turn on the loading flag
     // check if we have an item and see if the quantity in our local state
     // is greater than the item.quantity. Because if our local state is
     // greater, that means we're adding to the items quantity and if do
     // not have an item, that means we're also adding an item to the basket
     if (!item || quantity > item.quantity) {
       const updatedQuantity = item ? quantity - item.quantity : quantity;
-
       try {
-        const basket = await agent.Basket.addItem(
-          product?.id!,
-          updatedQuantity
+        dispatch(
+          addBasketItemAsync({
+            productId: product?.id!,
+            quantity: updatedQuantity,
+          })
         );
-        // setBasket(basket);
-        dispatch(setBasket(basket));
       } catch (error) {
         console.log(error);
-      } finally {
-        setSubmitting(false);
       }
       // if we do have the item or the quantity is less than item.quantity
       // then we are removing from the item
     } else {
       const updatedQuantity = item.quantity - quantity;
       try {
-        const basket = await agent.Basket.removeItem(
-          product?.id!,
-          updatedQuantity
-        );
-        setBasket(basket);
-        // removeItem(item.productId, updatedQuantity);
         dispatch(
-          removeItem({ productId: product?.id, quantity: updatedQuantity })
+          removeBasketItemAsync({
+            productId: product?.id!,
+            quantity: updatedQuantity,
+          })
         );
       } catch (error) {
         console.log(error);
-      } finally {
-        setSubmitting(false);
       }
     }
   };
@@ -161,7 +153,7 @@ export default function ProductDetails() {
               disabled={
                 item?.quantity === quantity || (!item && quantity === 0)
               }
-              loading={sumitting}
+              loading={status.includes("pendingRemoveItem" + item?.productId)}
               onClick={handleUpdateCart}
               sx={{ height: "55px" }}
               color="primary"
