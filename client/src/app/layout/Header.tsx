@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { useStoreContext } from "../context/StoreContext";
+import { useAppSelector } from "../store/configureStore";
 
 const midLinks = [
   { title: "catalog", path: "/catalog" },
@@ -44,7 +45,9 @@ interface Props {
 }
 
 export default function Header({ paletteType, onSwitch }: Props) {
-  const { basket } = useStoreContext();
+  // To get access to the state from redux store
+  const { basket } = useAppSelector((state) => state.basket);
+  // const { basket } = useStoreContext();
   // Get the items inside the basket and multiplied by each of their quantity
   // use reduce - to reduce an array of items that have a quantity value and
   // we want to reduce that array into single number that we can use to populate

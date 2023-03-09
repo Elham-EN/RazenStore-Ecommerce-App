@@ -18,6 +18,8 @@ import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { toast } from "react-toastify";
 import { useStoreContext } from "../../app/context/StoreContext";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { removeItem, setBasket } from "../basket/basketSlice";
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +28,9 @@ export default function ProductDetails() {
   //how many items does the user already have of item inside the basket
   const [quantity, setQuantity] = useState(0);
   const [sumitting, setSubmitting] = useState(false);
-  const { basket, setBasket, removeItem } = useStoreContext();
+  // const { basket, setBasket, removeItem } = useStoreContext();
+  const { basket } = useAppSelector((state) => state.basket);
+  const dispatch = useAppDispatch();
   //need to find out if we have the item in our basket
   const item = basket?.items.find((item) => item.productId === product?.id);
 
@@ -62,7 +66,8 @@ export default function ProductDetails() {
           product?.id!,
           updatedQuantity
         );
-        setBasket(basket);
+        // setBasket(basket);
+        dispatch(setBasket(basket));
       } catch (error) {
         console.log(error);
       } finally {
@@ -78,7 +83,10 @@ export default function ProductDetails() {
           updatedQuantity
         );
         setBasket(basket);
-        removeItem(item.productId, updatedQuantity);
+        // removeItem(item.productId, updatedQuantity);
+        dispatch(
+          removeItem({ productId: product?.id, quantity: updatedQuantity })
+        );
       } catch (error) {
         console.log(error);
       } finally {

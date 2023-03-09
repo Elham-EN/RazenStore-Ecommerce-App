@@ -19,6 +19,8 @@ import agent from "../../app/api/agent";
 import { LoadingButton } from "@mui/lab";
 import BasketSummary from "./BasketSummary";
 import { Link } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
+import { removeItem, setBasket } from "./basketSlice";
 
 export default function BasketPage() {
   // const [loading, setLoading] = useState(true);
@@ -33,7 +35,13 @@ export default function BasketPage() {
 
   // if (loading) return <LoadingComponent message="Loading basket..." />;
 
-  const { basket, setBasket, removeItem } = useStoreContext();
+  // const { basket, setBasket, removeItem } = useStoreContext();
+
+  // Access Redux State basket
+  const { basket } = useAppSelector((state) => state.basket);
+  // Dispatch Action to update the redux state
+  const dispatch = useAppDispatch();
+
   const [status, setStatus] = useState({
     loading: false,
     name: "",
@@ -43,7 +51,8 @@ export default function BasketPage() {
     setStatus({ loading: true, name });
     try {
       const basket = await agent.Basket.addItem(productId);
-      setBasket(basket); //Update our global state Basket Object
+      //Update our global state Basket Object
+      dispatch(setBasket(basket));
     } catch (error) {
       console.log(error);
     } finally {
@@ -58,9 +67,11 @@ export default function BasketPage() {
   ) => {
     setStatus({ loading: true, name });
     try {
-      const basket = await agent.Basket.removeItem(productId, quantity);
-      setBasket(basket);
-      removeItem(productId, quantity);
+      // const basket = await agent.Basket.removeItem(productId, quantity);
+      // setBasket(basket)
+      // removeItem(productId, quantity);
+      await agent.Basket.removeItem(productId, quantity);
+      dispatch(removeItem({ productId, quantity }));
     } catch (error) {
       console.log(error);
     } finally {

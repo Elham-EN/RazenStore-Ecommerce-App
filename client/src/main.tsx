@@ -11,9 +11,9 @@ import { store } from "./app/store/configureStore";
 import { Provider } from "react-redux";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <StoreProvider>
-    <Provider store={store}>
-      <RouterProvider router={router} />
-    </Provider>
-  </StoreProvider>
+  // <StoreProvider>
+  <Provider store={store}>
+    <RouterProvider router={router} />
+  </Provider>
+  // </StoreProvider>
 );
