@@ -12,8 +12,6 @@ import {
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { useParams } from "react-router-dom";
-import { Product } from "../../app/models/Product";
-import agent from "../../app/api/agent";
 import NotFound from "../../app/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { useAppDispatch, useAppSelector } from "../../app/store/configureStore";
@@ -21,16 +19,18 @@ import {
   addBasketItemAsync,
   removeBasketItemAsync,
 } from "../basket/basketSlice";
+import { fetchProductAsync, productSelectors } from "./catalogSlice";
 
 export default function ProductDetails() {
   const { id } = useParams<{ id: string }>();
-  const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
   //how many items does the user already have of item inside the basket
   const [quantity, setQuantity] = useState(0);
-  // const [sumitting, setSubmitting] = useState(false);
-  // const { basket, setBasket, removeItem } = useStoreContext();
   const { basket, status } = useAppSelector((state) => state.basket);
+  const { status: productStatus } = useAppSelector((state) => state.catalog);
+  // Select specific product
+  const product = useAppSelector((state) =>
+    productSelectors.selectById(state, id!)
+  );
   const dispatch = useAppDispatch();
   //need to find out if we have the item in our basket
   const item = basket?.items.find((item) => item.productId === product?.id);
@@ -38,12 +38,9 @@ export default function ProductDetails() {
   useEffect(() => {
     // sets the quantity if we have the item
     if (item) setQuantity(item.quantity);
-    id &&
-      agent.Catalog.details(parseInt(id))
-        .then((response) => setProduct(response))
-        .catch((error) => console.log(error))
-        .finally(() => setLoading(false));
-  }, [id, item]);
+    // if we do not have the product, then get the product
+    if (!product && id) dispatch(fetchProductAsync(parseInt(id)));
+  }, [id, item, dispatch, product]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (parseInt(event.target.value) >= 0)
@@ -87,7 +84,7 @@ export default function ProductDetails() {
     }
   };
 
-  if (loading) {
+  if (productStatus.includes("pendingFetchProduct")) {
     return <LoadingComponent message="Loading product details..." />;
   }
 
