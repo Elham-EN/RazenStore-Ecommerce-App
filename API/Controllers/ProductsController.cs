@@ -21,16 +21,17 @@ namespace API.Controllers
         [HttpGet] // api/products
         // if we do not specify a route parameter for the HTTP, then the API controller
         // is going to assume that we want to pass this "orderBy" as a query string value
-        public async Task<ActionResult<List<Product>>> GetProducts(string orderby) 
+        public async Task<ActionResult<List<Product>>> GetProducts(string orderBy, 
+            string searchTerm) 
         {
             // convert  an array into an IQueryable object, it provide a additional
             // functionailty to enable querying data from the data source or collection 
             // in more efficent manner. (filter, sort, group) 
-            var query = context.Products.AsQueryable();
+            var query = context.Products.Sort(orderBy).Search(searchTerm).AsQueryable();
             // query passed as first parameter to Sort & query string value as second
-            var sortedQuery = query.Sort(orderby);
+            // var sortedQuery = query.Sort(orderBy);
             // execute our query against the database & return the sorted products
-            return await sortedQuery.ToListAsync();
+            return await query.ToListAsync();
         }
 
         [HttpGet("{id}")] // api/products/3
