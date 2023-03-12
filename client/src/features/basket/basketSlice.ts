@@ -26,11 +26,11 @@ interface AsyncBasketAdd {
 
 export const addBasketItemAsync = createAsyncThunk<Basket, AsyncBasketAdd>(
   "basket/addBasketItemAsync",
-  async ({ productId, quantity = 1 }) => {
+  async ({ productId, quantity = 1 }, thunkAPI) => {
     try {
       return await agent.Basket.addItem(productId, quantity);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue({ error: error.data });
     }
   }
 );
@@ -43,11 +43,11 @@ interface AsyncBasketRemove {
 
 export const removeBasketItemAsync = createAsyncThunk<void, AsyncBasketRemove>(
   "basket/removeBasketItemAsync",
-  async ({ productId, quantity }) => {
+  async ({ productId, quantity }, thunkAPI) => {
     try {
       return await agent.Basket.removeItem(productId, quantity);
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      return thunkAPI.rejectWithValue({ error: error.data });
     }
   }
 );
@@ -82,7 +82,8 @@ export const basketSlice = createSlice({
       state.basket = action.payload;
       state.status = "idle";
     });
-    builder.addCase(addBasketItemAsync.rejected, (state) => {
+    builder.addCase(addBasketItemAsync.rejected, (state, action) => {
+      console.log(action.payload);
       state.status = "idle";
     });
     builder.addCase(removeBasketItemAsync.pending, (state, action) => {
@@ -109,6 +110,7 @@ export const basketSlice = createSlice({
       state.status = "idle";
     });
     builder.addCase(removeBasketItemAsync.rejected, (state, action) => {
+      console.log(action.payload);
       state.status = "idle";
     });
   },
