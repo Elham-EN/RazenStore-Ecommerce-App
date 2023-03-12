@@ -1,6 +1,7 @@
 
 using API.Data;
 using API.Entities;
+using API.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,15 +19,18 @@ namespace API.Controllers
         
         //We must specify the of result we are returning
         [HttpGet] // api/products
-        //The GetProducts method returns a list of all products in the 
-        //database in response to an HTTP GET request to the associated URL
-        public async Task<ActionResult<List<Product>>> GetProducts() 
+        // if we do not specify a route parameter for the HTTP, then the API controller
+        // is going to assume that we want to pass this "orderBy" as a query string value
+        public async Task<ActionResult<List<Product>>> GetProducts(string orderby) 
         {
-            //to retrieve all products from the database and return 
-            //them as a list of Product objects
-            var products = await context.Products.ToListAsync();
-            //return HTTP 200 OK along with the list of products
-            return Ok(products); 
+            // convert  an array into an IQueryable object, it provide a additional
+            // functionailty to enable querying data from the data source or collection 
+            // in more efficent manner. (filter, sort, group) 
+            var query = context.Products.AsQueryable();
+            // query passed as first parameter to Sort & query string value as second
+            var sortedQuery = query.Sort(orderby);
+            // execute our query against the database & return the sorted products
+            return await sortedQuery.ToListAsync();
         }
 
         [HttpGet("{id}")] // api/products/3
