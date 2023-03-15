@@ -31,6 +31,35 @@ namespace API.Extensions
             // query for the product name and return that product
             return query.Where(product => product.Name.ToLower().Contains(lowerCaseSearchTerm));
         }
+
+         public static IQueryable<Product> Filter(this IQueryable<Product> query, string brands, 
+            string types)
+        {
+            var brandList = new List<string>();
+            var typeList = new List<string>();
+
+             if (!string.IsNullOrEmpty(brands))
+            {
+                // AddRange adds all elements of the new List object to the end of the brandList.
+                // ToList is called on resulting array of substrings to convert it into a List
+                // Split is called on brands, split the string into array of substrings, with 
+                // each substrings being separated by a comma
+                brandList.AddRange(brands.ToLower().Split(",").ToList());
+            }
+
+             if (!string.IsNullOrEmpty(types))
+            {
+                typeList.AddRange(types.ToLower().Split(",").ToList());
+            }
+
+            query = query.Where(product => brandList.Count == 0 || 
+                brandList.Contains(product.Brand.ToLower()));
+            
+            query = query.Where(product => typeList.Count == 0 || 
+                typeList.Contains(product.Type.ToLower()));
+
+            return query;
+        } 
     }
 }
 

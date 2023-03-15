@@ -1,10 +1,10 @@
 
+using System.Text.Json;
 using API.Data;
 using API.Entities;
 using API.Extensions;
+using API.RequestHelpers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
 namespace API.Controllers
 {
     public class ProductsController: BaseApiController
@@ -21,17 +21,23 @@ namespace API.Controllers
         [HttpGet] // api/products
         // if we do not specify a route parameter for the HTTP, then the API controller
         // is going to assume that we want to pass this "orderBy" as a query string value
-        public async Task<ActionResult<List<Product>>> GetProducts(string orderBy, 
-            string searchTerm) 
+        public async Task<ActionResult<PagedList<Product>>> GetProducts([FromQuery]ProductParams productParams) 
         {
             // convert  an array into an IQueryable object, it provide a additional
             // functionailty to enable querying data from the data source or collection 
             // in more efficent manner. (filter, sort, group) 
-            var query = context.Products.Sort(orderBy).Search(searchTerm).AsQueryable();
+            var query = context.Products
+                .Sort(productParams.OrderBy)
+                .Search(productParams.searchTerm)
+                .Filter(productParams.Brands, productParams.Types)
+                .AsQueryable();
             // query passed as first parameter to Sort & query string value as second
             // var sortedQuery = query.Sort(orderBy);
             // execute our query against the database & return the sorted products
-            return await query.ToListAsync();
+           var products = await PagedList<Product>
+                .ToPagedList(query, productParams.PageNumber, productParams.PageSize);
+            Response.Headers.Add("Pagination", JsonSerializer.Serialize(products.MetaData));
+            return products;
         }
 
         [HttpGet("{id}")] // api/products/3
