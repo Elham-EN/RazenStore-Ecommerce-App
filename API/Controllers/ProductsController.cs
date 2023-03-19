@@ -5,6 +5,8 @@ using API.Entities;
 using API.Extensions;
 using API.RequestHelpers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 namespace API.Controllers
 {
     public class ProductsController: BaseApiController
@@ -21,7 +23,8 @@ namespace API.Controllers
         [HttpGet] // api/products
         // if we do not specify a route parameter for the HTTP, then the API controller
         // is going to assume that we want to pass this "orderBy" as a query string value
-        public async Task<ActionResult<PagedList<Product>>> GetProducts([FromQuery]ProductParams productParams) 
+        public async Task<ActionResult<PagedList<Product>>> GetProducts(
+            [FromQuery]ProductParams productParams) 
         {
             // convert  an array into an IQueryable object, it provide a additional
             // functionailty to enable querying data from the data source or collection 
@@ -36,7 +39,7 @@ namespace API.Controllers
             // execute our query against the database & return the sorted products
            var products = await PagedList<Product>
                 .ToPagedList(query, productParams.PageNumber, productParams.PageSize);
-            Response.Headers.Add("Pagination", JsonSerializer.Serialize(products.MetaData));
+            Response.AddPaginationHeader(products.MetaData);
             return products;
         }
 
@@ -46,6 +49,15 @@ namespace API.Controllers
             var product = await context.Products.FindAsync(id);
             if (product == null) return NotFound();
             return product;
+        }
+
+        [HttpGet("filters")]
+        public async Task<IActionResult> GetFilters() 
+        {
+            // Need uniqe value of ecah brand inside the database
+            var brands = await context.Products.Select(product => product.Brand).Distinct().ToListAsync();
+            var types = await context.Products.Select(product => product.Type).Distinct().ToListAsync();
+            return Ok(new {brands, types});
         }
  
     }
